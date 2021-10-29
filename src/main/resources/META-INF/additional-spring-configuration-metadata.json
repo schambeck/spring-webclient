@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "spring-rest.base-url",
+      "type": "java.lang.String",
+      "description": "Base URL for REST requests."
+  }
+] }
