@@ -32,12 +32,12 @@ public class InvoiceController {
         return service.create(invoice);
     }
 
-    @PutMapping(value = "/{index}")
+    @PutMapping("/{index}")
     public Mono<Invoice> update(@PathVariable("index") Integer index, @RequestBody Invoice invoice) {
         return service.update(index, invoice);
     }
 
-    @DeleteMapping(value = "/{index}")
+    @DeleteMapping("/{index}")
     public Mono<Void> delete(@PathVariable int index) {
         return service.delete(index);
     }

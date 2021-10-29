@@ -32,9 +32,7 @@ public class InvoiceService {
 
     public Mono<Invoice> findByIndex(int index) {
         return client.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/invoices/{index}")
-                        .build(index))
+                .uri(uriBuilder -> uriBuilder.path("/invoices/{index}").build(index))
                 .accept(APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(Invoice.class);
@@ -51,9 +49,7 @@ public class InvoiceService {
 
     public Mono<Invoice> update(int index, Invoice invoice) {
         return client.put()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/invoices/{index}")
-                        .build(index))
+                .uri(uriBuilder -> uriBuilder.path("/invoices/{index}").build(index))
                 .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 .body(BodyInserters.fromValue(invoice))
                 .retrieve()
@@ -62,9 +58,7 @@ public class InvoiceService {
 
     public Mono<Void> delete(int index) {
         return client.delete()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/invoices/{index}")
-                        .build(index))
+                .uri(uriBuilder -> uriBuilder.path("/invoices/{index}").build(index))
                 .retrieve()
                 .bodyToMono(Void.class);
     }
