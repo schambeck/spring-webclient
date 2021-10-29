@@ -2,9 +2,7 @@ package com.jobsity.webclient.controller;
 
 import com.jobsity.webclient.domain.Invoice;
 import com.jobsity.webclient.service.InvoiceRestTemplateService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -12,15 +10,35 @@ import java.util.List;
 @RequestMapping("/invoices-rest-template")
 public class InvoiceRestTemplateController {
 
-    private final InvoiceRestTemplateService restTemplateService;
+    private final InvoiceRestTemplateService service;
 
-    public InvoiceRestTemplateController(InvoiceRestTemplateService restTemplateService) {
-        this.restTemplateService = restTemplateService;
+    public InvoiceRestTemplateController(InvoiceRestTemplateService service) {
+        this.service = service;
     }
 
     @GetMapping
     public List<Invoice> findAll() {
-        return restTemplateService.findAll();
+        return service.findAll();
+    }
+
+    @GetMapping("/{index}")
+    public Invoice findByIndex(@PathVariable("index") int index) {
+        return service.findByIndex(index);
+    }
+
+    @PostMapping
+    public Invoice create(@RequestBody Invoice invoice) {
+        return service.create(invoice);
+    }
+
+    @PutMapping("/{index}")
+    public Invoice update(@PathVariable("index") Integer index, @RequestBody Invoice invoice) {
+        return service.update(index, invoice);
+    }
+
+    @DeleteMapping("/{index}")
+    public Void delete(@PathVariable int index) {
+        return service.delete(index);
     }
 
 }
