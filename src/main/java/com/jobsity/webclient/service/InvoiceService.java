@@ -30,9 +30,9 @@ public class InvoiceService {
                 .bodyToMono(new ParameterizedTypeReference<List<Invoice>>() {});
     }
 
-    public Mono<Invoice> findByIndex(int index) {
+    public Mono<Invoice> findById(Long id) {
         return client.get()
-                .uri(uriBuilder -> uriBuilder.path("/invoices/{index}").build(index))
+                .uri(uriBuilder -> uriBuilder.path("/invoices/{id}").build(id))
                 .accept(APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(Invoice.class);
@@ -47,18 +47,18 @@ public class InvoiceService {
                 .bodyToMono(Invoice.class);
     }
 
-    public Mono<Invoice> update(int index, Invoice invoice) {
+    public Mono<Invoice> update(Long id, Invoice invoice) {
         return client.put()
-                .uri(uriBuilder -> uriBuilder.path("/invoices/{index}").build(index))
+                .uri(uriBuilder -> uriBuilder.path("/invoices/{id}").build(id))
                 .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 .body(BodyInserters.fromValue(invoice))
                 .retrieve()
                 .bodyToMono(Invoice.class);
     }
 
-    public Mono<Void> delete(int index) {
+    public Mono<Void> delete(Long id) {
         return client.delete()
-                .uri(uriBuilder -> uriBuilder.path("/invoices/{index}").build(index))
+                .uri(uriBuilder -> uriBuilder.path("/invoices/{id}").build(id))
                 .retrieve()
                 .bodyToMono(Void.class);
     }

@@ -22,9 +22,9 @@ public class InvoiceController {
         return service.findAll();
     }
 
-    @GetMapping("/{index}")
-    public Mono<Invoice> findByIndex(@PathVariable("index") int index) {
-        return service.findByIndex(index);
+    @GetMapping("/{id}")
+    public Mono<Invoice> findById(@PathVariable("id") Long id) {
+        return service.findById(id);
     }
 
     @PostMapping
@@ -32,14 +32,14 @@ public class InvoiceController {
         return service.create(invoice);
     }
 
-    @PutMapping("/{index}")
-    public Mono<Invoice> update(@PathVariable("index") Integer index, @RequestBody Invoice invoice) {
-        return service.update(index, invoice);
+    @PutMapping("/{id}")
+    public Mono<Invoice> update(@PathVariable("id") Long id, @RequestBody Invoice invoice) {
+        return service.update(id, invoice);
     }
 
-    @DeleteMapping("/{index}")
-    public Mono<Void> delete(@PathVariable int index) {
-        return service.delete(index);
+    @DeleteMapping("/{id}")
+    public Mono<Void> delete(@PathVariable Long id) {
+        return service.delete(id);
     }
 
 }

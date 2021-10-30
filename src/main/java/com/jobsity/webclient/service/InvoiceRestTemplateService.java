@@ -24,20 +24,20 @@ public class InvoiceRestTemplateService {
         return restTemplate.exchange("/invoices", GET,null, type).getBody();
     }
 
-    public Invoice findByIndex(int index) {
-        return restTemplate.getForObject("/invoices/{index}", Invoice.class, index);
+    public Invoice findById(Long id) {
+        return restTemplate.getForObject("/invoices/{id}", Invoice.class, id);
     }
 
     public Invoice create(Invoice invoice) {
         return restTemplate.postForObject("/invoices", invoice, Invoice.class);
     }
 
-    public Invoice update(int index, Invoice invoice) {
-        return restTemplate.exchange("/invoices/{index}", PUT, new HttpEntity<>(invoice), Invoice.class, index).getBody();
+    public Invoice update(Long id, Invoice invoice) {
+        return restTemplate.exchange("/invoices/{id}", PUT, new HttpEntity<>(invoice), Invoice.class, id).getBody();
     }
 
-    public Void delete(int index) {
-        return restTemplate.exchange("/invoices/{index}", DELETE, null, Void.class, index).getBody();
+    public Void delete(Long id) {
+        return restTemplate.exchange("/invoices/{id}", DELETE, null, Void.class, id).getBody();
     }
 
 }
