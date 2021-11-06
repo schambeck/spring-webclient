@@ -1,15 +1,22 @@
 package com.jobsity.webclient.service;
 
+import com.jobsity.webclient.conf.ClientErrorException;
+import com.jobsity.webclient.conf.ServerErrorException;
+import com.jobsity.webclient.conf.ServiceUnavailableException;
 import com.jobsity.webclient.domain.Invoice;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
+import java.time.Duration;
 import java.util.List;
 
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -28,7 +35,14 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .uri("/invoices")
                 .accept(APPLICATION_JSON)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<Invoice>>() {});
+                .onStatus(HttpStatus::is4xxClientError, response -> Mono.error(new ClientErrorException("Client error", response.rawStatusCode())))
+                .onStatus(HttpStatus::is5xxServerError, response -> Mono.just(new ServerErrorException("Server error", response.rawStatusCode())))
+                .bodyToMono(new ParameterizedTypeReference<List<Invoice>>() {})
+                .retryWhen(Retry.backoff(3, Duration.ofSeconds(2))
+                        .filter(throwable -> throwable instanceof ServerErrorException)
+                        .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> {
+                            throw new ServiceUnavailableException("External Service failed to process after max retries", SERVICE_UNAVAILABLE.value());
+                        }));
     }
 
     @Override
@@ -37,7 +51,14 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .uri(uriBuilder -> uriBuilder.path("/invoices/{id}").build(id))
                 .accept(APPLICATION_JSON)
                 .retrieve()
-                .bodyToMono(Invoice.class);
+                .onStatus(HttpStatus::is4xxClientError, response -> Mono.error(new ClientErrorException("Client error", response.rawStatusCode())))
+                .onStatus(HttpStatus::is5xxServerError, response -> Mono.just(new ServerErrorException("Server error", response.rawStatusCode())))
+                .bodyToMono(Invoice.class)
+                .retryWhen(Retry.backoff(3, Duration.ofSeconds(2))
+                    .filter(throwable -> throwable instanceof ServerErrorException)
+                    .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> {
+                        throw new ServiceUnavailableException("External Service failed to process after max retries", SERVICE_UNAVAILABLE.value());
+                    }));
     }
 
     @Override
