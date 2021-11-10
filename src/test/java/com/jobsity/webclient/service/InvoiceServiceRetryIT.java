@@ -23,7 +23,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("integration")
-class InvoiceServiceRetryITTest {
+class InvoiceServiceRetryIT {
 
     private static ObjectMapper mapper;
     private static MockWebServer mockWebServer;

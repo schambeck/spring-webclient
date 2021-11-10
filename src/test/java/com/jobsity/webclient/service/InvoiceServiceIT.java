@@ -26,7 +26,7 @@ import static java.time.Month.FEBRUARY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Tag("integration")
-class InvoiceServiceITTest {
+class InvoiceServiceIT {
 
     private static MockWebServer mockWebServer;
 
