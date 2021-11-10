@@ -1,5 +1,7 @@
 package com.jobsity.webclient.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.jobsity.webclient.conf.ObjectMapperUtil;
 import com.jobsity.webclient.domain.Invoice;
 import okhttp3.mockwebserver.MockResponse;
@@ -9,8 +11,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -21,23 +21,25 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
 import static java.time.Month.FEBRUARY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @Tag("integration")
-@SpringBootTest(webEnvironment = RANDOM_PORT)
 class InvoiceServiceITTest {
 
     private static MockWebServer mockWebServer;
 
     private static InvoiceService service;
 
-    @Autowired
-    private ObjectMapperUtil mapperUtil;
+    private static ObjectMapperUtil mapperUtil;
 
     @BeforeAll
     static void init() throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(WRITE_DATES_AS_TIMESTAMPS);
+        mapperUtil = new ObjectMapperUtil(mapper);
         mockWebServer = new MockWebServer();
         mockWebServer.start();
         String baseUrl = String.format("http://localhost:%s", mockWebServer.getPort());

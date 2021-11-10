@@ -2,7 +2,6 @@ package com.jobsity.webclient.service;
 
 import com.jobsity.webclient.conf.ClientErrorException;
 import com.jobsity.webclient.domain.Invoice;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -32,18 +32,6 @@ class InvoiceServiceTest {
     @Autowired
     private WebTestClient webClient;
 
-    private List<Invoice> allInvoices;
-
-    @BeforeEach
-    void setUp() {
-        allInvoices = new ArrayList<Invoice>() {{
-            add(createInvoice(1L, "2021-02-01", 1000));
-            add(createInvoice(2L, "2021-02-02", 2000));
-            add(createInvoice(3L, "2021-02-03", 3000));
-            add(createInvoice(4L, "2021-02-04", 4000));
-        }};
-    }
-
     private Invoice createInvoice(String issued, double total) {
         return createInvoice(null, issued, total);
     }
@@ -52,19 +40,25 @@ class InvoiceServiceTest {
         return new Invoice(id, LocalDate.parse(issued), BigDecimal.valueOf(total));
     }
 
-    private boolean assertInvoice(List<Invoice> invoices, int index, int id, String issued, double total) {
+    private void assertInvoice(List<Invoice> invoices, int index, int id, String issued, double total) {
         Invoice invoice = invoices.get(index);
-        return assertInvoice(invoice, id, issued, total);
+        assertInvoice(invoice, id, issued, total);
     }
 
-    private boolean assertInvoice(Invoice invoice, int id, String issued, double total) {
-        return invoice.getId().equals((long) id)
-                && invoice.getIssued().equals(LocalDate.parse(issued))
-                && invoice.getTotal().equals(BigDecimal.valueOf(total));
+    private void assertInvoice(Invoice invoice, int id, String issued, double total) {
+        assertEquals(id, invoice.getId());
+        assertEquals(LocalDate.parse(issued), invoice.getIssued());
+        assertEquals(total, invoice.getTotal().doubleValue());
     }
 
     @Test
     void findAll() {
+        List<Invoice> allInvoices = new ArrayList<Invoice>() {{
+            add(createInvoice(1L, "2021-02-01", 1000));
+            add(createInvoice(2L, "2021-02-02", 2000));
+            add(createInvoice(3L, "2021-02-03", 3000));
+            add(createInvoice(4L, "2021-02-04", 4000));
+        }};
         when(service.findAll()).thenReturn(Mono.just(allInvoices));
 
         webClient.get().uri("/invoices")

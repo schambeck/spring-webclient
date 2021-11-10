@@ -3,13 +3,12 @@ package com.jobsity.webclient.controller;
 import com.jobsity.webclient.conf.ClientErrorException;
 import com.jobsity.webclient.domain.Invoice;
 import com.jobsity.webclient.service.InvoiceService;
-import org.junit.jupiter.api.BeforeEach;
+import com.jobsity.webclient.service.InvoiceServiceImpl;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -24,26 +23,14 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Tag("unit")
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest(classes = {InvoiceController.class, InvoiceServiceImpl.class})
 class InvoiceControllerTest {
 
-    @InjectMocks
+    @Autowired
     private InvoiceController controller;
 
-    @Mock
+    @MockBean
     private InvoiceService service;
-
-    private List<Invoice> allInvoices;
-
-    @BeforeEach
-    void setUp() {
-        allInvoices = new ArrayList<Invoice>() {{
-            add(createInvoice(1L, "2021-02-01", 1000));
-            add(createInvoice(2L, "2021-02-02", 2000));
-            add(createInvoice(3L, "2021-02-03", 3000));
-            add(createInvoice(4L, "2021-02-04", 4000));
-        }};
-    }
 
     private Invoice createInvoice(String issued, double total) {
         return createInvoice(null, issued, total);
@@ -66,6 +53,12 @@ class InvoiceControllerTest {
 
     @Test
     void findAll() {
+        List<Invoice> allInvoices = new ArrayList<Invoice>() {{
+            add(createInvoice(1L, "2021-02-01", 1000));
+            add(createInvoice(2L, "2021-02-02", 2000));
+            add(createInvoice(3L, "2021-02-03", 3000));
+            add(createInvoice(4L, "2021-02-04", 4000));
+        }};
         when(service.findAll()).thenReturn(Mono.just(allInvoices));
         Mono<List<Invoice>> found = controller.findAll();
         StepVerifier.create(found)
