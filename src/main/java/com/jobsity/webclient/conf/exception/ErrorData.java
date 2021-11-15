@@ -1,4 +1,4 @@
-package com.jobsity.webclient.conf;
+package com.jobsity.webclient.conf.exception;
 
 public class ErrorData {
 

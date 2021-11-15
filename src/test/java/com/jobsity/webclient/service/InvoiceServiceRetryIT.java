@@ -2,8 +2,8 @@ package com.jobsity.webclient.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.jobsity.webclient.conf.ClientErrorException;
-import com.jobsity.webclient.conf.ServiceUnavailableException;
+import com.jobsity.webclient.conf.exception.ClientErrorException;
+import com.jobsity.webclient.conf.exception.ServiceUnavailableException;
 import com.jobsity.webclient.domain.Invoice;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;

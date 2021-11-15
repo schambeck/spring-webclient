@@ -1,6 +1,6 @@
 package com.jobsity.webclient.service;
 
-import com.jobsity.webclient.conf.ServerErrorException;
+import com.jobsity.webclient.conf.exception.ServerErrorException;
 import com.jobsity.webclient.domain.Invoice;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
