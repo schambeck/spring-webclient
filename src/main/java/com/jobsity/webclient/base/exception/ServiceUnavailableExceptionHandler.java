@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
-public class ServiceUnavailableExceptionHandler extends ResponseEntityExceptionHandler {
+class ServiceUnavailableExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ServiceUnavailableException.class)
     protected ResponseEntity<ErrorData> handleServerUnavailableException(ServiceUnavailableException exception) {

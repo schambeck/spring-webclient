@@ -8,16 +8,14 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
 @Configuration
-public class RestTemplateConfig {
+class RestTemplateConfig {
 
 	@Value("${spring-rest.base-url}")
 	private String baseUrl;
 
 	@Bean
-	public RestTemplate createRestTemplate() {
-		RestTemplate restTemplate = new RestTemplateBuilder().build();
-		restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(baseUrl));
-		return restTemplate;
+	RestTemplate createRestTemplate(RestTemplateBuilder builder) {
+		return builder.uriTemplateHandler(new DefaultUriBuilderFactory(baseUrl)).build();
 	}
 
 }

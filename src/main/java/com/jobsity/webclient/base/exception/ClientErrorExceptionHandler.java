@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
-public class ClientErrorExceptionHandler extends ResponseEntityExceptionHandler {
+class ClientErrorExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ClientErrorException.class)
     protected ResponseEntity<ErrorData> handleClientErrorException(ClientErrorException exception) {

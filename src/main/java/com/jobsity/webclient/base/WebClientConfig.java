@@ -9,15 +9,14 @@ import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Configuration
-public class WebClientConfig {
+class WebClientConfig {
 
 	@Value("${spring-rest.base-url}")
 	private String baseUrl;
 
 	@Bean
-	public WebClient createWebClient() {
-		return WebClient.builder()
-				.baseUrl(baseUrl)
+	WebClient createWebClient(WebClient.Builder builder) {
+		return builder.baseUrl(baseUrl)
 				.defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
 				.build();
 	}

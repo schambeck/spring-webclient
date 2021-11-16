@@ -1,6 +1,7 @@
 package com.jobsity.webclient.service;
 
 import com.jobsity.webclient.domain.Invoice;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
@@ -11,13 +12,10 @@ import java.util.List;
 import static org.springframework.http.HttpMethod.*;
 
 @Service
-public class InvoiceRestTemplateServiceImpl implements InvoiceRestTemplateService {
+@RequiredArgsConstructor
+class InvoiceRestTemplateServiceImpl implements InvoiceRestTemplateService {
 
     private final RestTemplate restTemplate;
-
-    public InvoiceRestTemplateServiceImpl(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
 
     @Override
     public List<Invoice> findAll() {

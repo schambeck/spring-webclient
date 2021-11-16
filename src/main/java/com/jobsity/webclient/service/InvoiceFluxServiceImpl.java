@@ -2,6 +2,7 @@ package com.jobsity.webclient.service;
 
 import com.jobsity.webclient.base.exception.ServerErrorException;
 import com.jobsity.webclient.domain.Invoice;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -18,13 +19,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Service
-public class InvoiceFluxServiceImpl implements InvoiceFluxService {
+@RequiredArgsConstructor
+class InvoiceFluxServiceImpl implements InvoiceFluxService {
 
     private final WebClient client;
-
-    public InvoiceFluxServiceImpl(WebClient client) {
-        this.client = client;
-    }
 
     @Override
     public Flux<Invoice> findAll() {

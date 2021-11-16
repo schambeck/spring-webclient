@@ -4,6 +4,7 @@ import com.jobsity.webclient.base.exception.ClientErrorException;
 import com.jobsity.webclient.base.exception.ServerErrorException;
 import com.jobsity.webclient.base.exception.ServiceUnavailableException;
 import com.jobsity.webclient.domain.Invoice;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,13 +22,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Service
+@RequiredArgsConstructor
 public class InvoiceServiceImpl implements InvoiceService {
 
     private final WebClient client;
-
-    public InvoiceServiceImpl(WebClient client) {
-        this.client = client;
-    }
 
     @Override
     public Mono<List<Invoice>> findAll() {
