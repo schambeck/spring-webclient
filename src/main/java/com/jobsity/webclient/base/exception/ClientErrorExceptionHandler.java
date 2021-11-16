@@ -1,4 +1,4 @@
-package com.jobsity.webclient.conf.exception;
+package com.jobsity.webclient.base.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

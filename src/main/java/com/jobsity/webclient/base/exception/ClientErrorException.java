@@ -1,10 +1,10 @@
-package com.jobsity.webclient.conf.exception;
+package com.jobsity.webclient.base.exception;
 
-public class ServerErrorException extends RuntimeException {
+public class ClientErrorException extends RuntimeException {
 
     private final int statusCode;
 
-    public ServerErrorException(String message, int statusCode) {
+    public ClientErrorException(String message, int statusCode) {
         super(message);
         this.statusCode = statusCode;
     }

@@ -1,6 +1,6 @@
 package com.jobsity.webclient.controller;
 
-import com.jobsity.webclient.conf.exception.ClientErrorException;
+import com.jobsity.webclient.base.exception.ClientErrorException;
 import com.jobsity.webclient.domain.Invoice;
 import com.jobsity.webclient.service.InvoiceService;
 import com.jobsity.webclient.service.InvoiceServiceImpl;

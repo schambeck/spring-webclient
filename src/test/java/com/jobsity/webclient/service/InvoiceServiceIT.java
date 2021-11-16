@@ -2,7 +2,7 @@ package com.jobsity.webclient.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.jobsity.webclient.conf.ObjectMapperUtil;
+import com.jobsity.webclient.base.ObjectMapperUtil;
 import com.jobsity.webclient.domain.Invoice;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;

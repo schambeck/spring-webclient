@@ -1,4 +1,4 @@
-package com.jobsity.webclient.conf;
+package com.jobsity.webclient.base;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;

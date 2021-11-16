@@ -1,4 +1,4 @@
-package com.jobsity.webclient.conf.exception;
+package com.jobsity.webclient.base.exception;
 
 public class ServiceUnavailableException extends RuntimeException {
 

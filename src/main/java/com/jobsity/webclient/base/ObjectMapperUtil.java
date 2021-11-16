@@ -1,4 +1,4 @@
-package com.jobsity.webclient.conf;
+package com.jobsity.webclient.base;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

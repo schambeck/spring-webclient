@@ -1,8 +1,8 @@
 package com.jobsity.webclient.service;
 
-import com.jobsity.webclient.conf.exception.ClientErrorException;
-import com.jobsity.webclient.conf.exception.ServerErrorException;
-import com.jobsity.webclient.conf.exception.ServiceUnavailableException;
+import com.jobsity.webclient.base.exception.ClientErrorException;
+import com.jobsity.webclient.base.exception.ServerErrorException;
+import com.jobsity.webclient.base.exception.ServiceUnavailableException;
 import com.jobsity.webclient.domain.Invoice;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;

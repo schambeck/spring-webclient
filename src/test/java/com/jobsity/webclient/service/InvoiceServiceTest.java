@@ -1,6 +1,6 @@
 package com.jobsity.webclient.service;
 
-import com.jobsity.webclient.conf.exception.ClientErrorException;
+import com.jobsity.webclient.base.exception.ClientErrorException;
 import com.jobsity.webclient.domain.Invoice;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
