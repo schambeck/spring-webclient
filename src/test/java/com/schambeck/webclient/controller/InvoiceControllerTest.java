@@ -3,19 +3,17 @@ package com.schambeck.webclient.controller;
 import com.schambeck.webclient.base.exception.ClientErrorException;
 import com.schambeck.webclient.domain.Invoice;
 import com.schambeck.webclient.service.InvoiceService;
-import com.schambeck.webclient.service.InvoiceServiceImpl;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -23,7 +21,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Tag("unit")
-@SpringBootTest(classes = {InvoiceController.class, InvoiceServiceImpl.class})
+@WebFluxTest(InvoiceController.class)
 class InvoiceControllerTest {
 
     @Autowired
@@ -40,11 +38,6 @@ class InvoiceControllerTest {
         return new Invoice(id, LocalDate.parse(issued), BigDecimal.valueOf(total));
     }
 
-    private boolean assertInvoice(List<Invoice> invoices, int index, int id, String issued, double total) {
-        Invoice invoice = invoices.get(index);
-        return assertInvoice(invoice, id, issued, total);
-    }
-
     private boolean assertInvoice(Invoice invoice, int id, String issued, double total) {
         return invoice.getId().equals((long) id)
                 && invoice.getIssued().equals(LocalDate.parse(issued))
@@ -53,19 +46,19 @@ class InvoiceControllerTest {
 
     @Test
     void findAll() {
-        List<Invoice> allInvoices = new ArrayList<Invoice>() {{
-            add(createInvoice(1L, "2021-02-01", 1000));
-            add(createInvoice(2L, "2021-02-02", 2000));
-            add(createInvoice(3L, "2021-02-03", 3000));
-            add(createInvoice(4L, "2021-02-04", 4000));
-        }};
-        when(service.findAll()).thenReturn(Mono.just(allInvoices));
-        Mono<List<Invoice>> found = controller.findAll();
+        Invoice[] allInvoices = {
+            createInvoice(1L, "2021-02-01", 1000),
+            createInvoice(2L, "2021-02-02", 2000),
+            createInvoice(3L, "2021-02-03", 3000),
+            createInvoice(4L, "2021-02-04", 4000)
+        };
+        when(service.findAll()).thenReturn(Flux.just(allInvoices));
+        Flux<Invoice> found = controller.findAll();
         StepVerifier.create(found)
-                .expectNextMatches(invoices -> assertInvoice(invoices, 0, 1, "2021-02-01", 1000)
-                        && assertInvoice(invoices, 1, 2, "2021-02-02", 2000)
-                        && assertInvoice(invoices, 2, 3, "2021-02-03", 3000)
-                        && assertInvoice(invoices, 3, 4, "2021-02-04", 4000))
+                .expectNextMatches(invoices -> assertInvoice(invoices, 1, "2021-02-01", 1000))
+                .expectNextMatches(invoices -> assertInvoice(invoices, 2, "2021-02-02", 2000))
+                .expectNextMatches(invoices -> assertInvoice(invoices, 3, "2021-02-03", 3000))
+                .expectNextMatches(invoices -> assertInvoice(invoices, 4, "2021-02-04", 4000))
                 .verifyComplete();
     }
 
@@ -101,8 +94,8 @@ class InvoiceControllerTest {
     @Test
     void update() {
         Invoice updated = createInvoice("2021-02-03", 3000);
-        Invoice result = createInvoice(1L, "2021-02-03", 3000);
-        when(service.update(1L, updated)).thenReturn(Mono.just(result));
+        Mono<Invoice> result = Mono.just(createInvoice(1L, "2021-02-03", 3000));
+        when(service.update(1L, updated)).thenReturn(result);
 
         StepVerifier.create(controller.update(1L, updated))
                 .expectNextMatches(invoice -> assertInvoice(invoice, 1, "2021-02-03", 3000))

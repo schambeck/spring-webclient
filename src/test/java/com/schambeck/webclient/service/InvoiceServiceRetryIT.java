@@ -2,6 +2,7 @@ package com.schambeck.webclient.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.schambeck.webclient.base.ObjectMapperUtil;
 import com.schambeck.webclient.base.exception.ClientErrorException;
 import com.schambeck.webclient.base.exception.ServiceUnavailableException;
 import com.schambeck.webclient.domain.Invoice;
@@ -25,39 +26,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Tag("integration")
 class InvoiceServiceRetryIT {
 
-    private static ObjectMapper mapper;
-    private static MockWebServer mockWebServer;
+    private ObjectMapperUtil mapperUtil;
+    private MockWebServer mockWebServer;
     private InvoiceService service;
 
-    @BeforeAll
-    static void setUp() throws IOException {
-        mapper = new ObjectMapper();
+    @BeforeEach
+    void setup() throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(WRITE_DATES_AS_TIMESTAMPS);
+        mapperUtil = new ObjectMapperUtil(mapper);
+
         mockWebServer = new MockWebServer();
         mockWebServer.start();
+
+        String baseUrl = mockWebServer.url("/").toString();
+        service = new InvoiceServiceImpl(WebClient.create(baseUrl));
     }
 
-    @AfterAll
-    static void tearDown() throws IOException {
+    @AfterEach
+    void tearDown() throws IOException {
         mockWebServer.shutdown();
-    }
-
-    @BeforeEach
-    void initialize() {
-        String baseUrl = String.format("http://localhost:%s", mockWebServer.getPort());
-        service = new InvoiceServiceImpl(WebClient.builder()
-                .baseUrl(baseUrl)
-                .build());
     }
 
     private Invoice createInvoice(Long id, String issued, double total) {
         return new Invoice(id, LocalDate.parse(issued), BigDecimal.valueOf(total));
-    }
-
-    private boolean assertInvoice(List<Invoice> invoices, int index, int id, String issued, double total) {
-        Invoice invoice = invoices.get(index);
-        return assertInvoice(invoice, id, issued, total);
     }
 
     private boolean assertInvoice(Invoice invoice, int id, String issued, double total) {
@@ -71,20 +64,20 @@ class InvoiceServiceRetryIT {
         mockWebServer.enqueue(new MockResponse().setResponseCode(SERVICE_UNAVAILABLE.code()));
         mockWebServer.enqueue(new MockResponse().setResponseCode(SERVICE_UNAVAILABLE.code()));
         mockWebServer.enqueue(new MockResponse().setResponseCode(SERVICE_UNAVAILABLE.code()));
-        List<Invoice> mockInvoices = new ArrayList<Invoice>() {{
+        List<Invoice> mockInvoices = new ArrayList<>() {{
             add(createInvoice(1L, "2021-02-01", 1000));
             add(createInvoice(2L, "2021-02-02", 2000));
             add(createInvoice(3L, "2021-02-03", 3000));
             add(createInvoice(4L, "2021-02-04", 4000));
         }};
-        mockWebServer.enqueue(new MockResponse().setResponseCode(OK.code()).setBody(mapper.writeValueAsString(mockInvoices))
+        mockWebServer.enqueue(new MockResponse().setResponseCode(OK.code()).setBody(mapperUtil.asJsonString(mockInvoices))
                 .addHeader("Content-Type", "application/json"));
 
         StepVerifier.create(service.findAll())
-                .expectNextMatches(invoices -> assertInvoice(invoices, 0, 1, "2021-02-01", 1000)
-                        && assertInvoice(invoices, 1, 2, "2021-02-02", 2000)
-                        && assertInvoice(invoices, 2, 3, "2021-02-03", 3000)
-                        && assertInvoice(invoices, 3, 4, "2021-02-04", 4000))
+                .expectNextMatches(invoices -> assertInvoice(invoices, 1, "2021-02-01", 1000))
+                .expectNextMatches(invoices -> assertInvoice(invoices, 2, "2021-02-02", 2000))
+                .expectNextMatches(invoices -> assertInvoice(invoices, 3, "2021-02-03", 3000))
+                .expectNextMatches(invoices -> assertInvoice(invoices, 4, "2021-02-04", 4000))
                 .verifyComplete();
 
         verifyNumberOfFindAllGetRequests(4);
@@ -110,7 +103,7 @@ class InvoiceServiceRetryIT {
         mockWebServer.enqueue(new MockResponse().setResponseCode(SERVICE_UNAVAILABLE.code()));
         mockWebServer.enqueue(new MockResponse().setResponseCode(SERVICE_UNAVAILABLE.code()));
         Invoice invoice = createInvoice(1L, "2021-02-01", 1000);
-        mockWebServer.enqueue(new MockResponse().setBody(mapper.writeValueAsString(invoice))
+        mockWebServer.enqueue(new MockResponse().setBody(mapperUtil.asJsonString(invoice))
                 .addHeader("Content-Type", "application/json"));
 
         StepVerifier.create(service.findById(1L))

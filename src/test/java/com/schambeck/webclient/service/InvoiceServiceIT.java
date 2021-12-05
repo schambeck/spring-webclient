@@ -3,16 +3,16 @@ package com.schambeck.webclient.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.schambeck.webclient.base.ObjectMapperUtil;
+import com.schambeck.webclient.base.exception.ClientErrorException;
 import com.schambeck.webclient.domain.Invoice;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.io.IOException;
@@ -22,57 +22,48 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
-import static java.time.Month.FEBRUARY;
+import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Tag("integration")
 class InvoiceServiceIT {
 
-    private static MockWebServer mockWebServer;
+    private ObjectMapperUtil mapperUtil;
+    private MockWebServer mockWebServer;
+    private InvoiceService service;
 
-    private static InvoiceService service;
-
-    private static ObjectMapperUtil mapperUtil;
-
-    @BeforeAll
-    static void init() throws IOException {
+    @BeforeEach
+    void setup() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(WRITE_DATES_AS_TIMESTAMPS);
         mapperUtil = new ObjectMapperUtil(mapper);
+
         mockWebServer = new MockWebServer();
         mockWebServer.start();
-        String baseUrl = String.format("http://localhost:%s", mockWebServer.getPort());
+
+        String baseUrl = mockWebServer.url("/").toString();
         service = new InvoiceServiceImpl(WebClient.create(baseUrl));
     }
 
-    @AfterAll
-    static void tearDown() throws IOException {
+    @AfterEach
+    void tearDown() throws IOException {
         mockWebServer.shutdown();
-    }
-
-    private Invoice createInvoice(String issued, double total) {
-        return createInvoice(null, issued, total);
     }
 
     private static Invoice createInvoice(Long id, String issued, double total) {
         return new Invoice(id, LocalDate.parse(issued), BigDecimal.valueOf(total));
     }
 
-    private boolean assertInvoice(List<Invoice> invoices, int index, int id, String issued, double total) {
-        Invoice invoice = invoices.get(index);
-        return assertInvoice(invoice, id, issued, total);
-    }
-
     private boolean assertInvoice(Invoice invoice, int id, String issued, double total) {
-        return invoice.getId().equals((long) id)
+        return Long.valueOf(id).equals(invoice.getId())
                 && invoice.getIssued().equals(LocalDate.parse(issued))
                 && invoice.getTotal().equals(BigDecimal.valueOf(total));
     }
 
     @Test
     void findAll() throws Exception {
-        List<Invoice> payload = new ArrayList<Invoice>() {{
+        List<Invoice> payload = new ArrayList<>() {{
             add(createInvoice(1L, "2021-02-01", 1000));
             add(createInvoice(2L, "2021-02-02", 2000));
             add(createInvoice(3L, "2021-02-03", 3000));
@@ -81,13 +72,11 @@ class InvoiceServiceIT {
         mockWebServer.enqueue(new MockResponse().setBody(mapperUtil.asJsonString(payload))
                 .addHeader("Content-Type", "application/json"));
 
-        Mono<List<Invoice>> found = service.findAll();
-
-        StepVerifier.create(found)
-                .expectNextMatches(invoices -> assertInvoice(invoices, 0, 1, "2021-02-01", 1000)
-                        && assertInvoice(invoices, 1, 2, "2021-02-02", 2000)
-                        && assertInvoice(invoices, 2, 3, "2021-02-03", 3000)
-                        && assertInvoice(invoices, 3, 4, "2021-02-04", 4000))
+        StepVerifier.create(service.findAll())
+                .expectNextMatches(invoices -> assertInvoice(invoices, 1, "2021-02-01", 1000))
+                .expectNextMatches(invoices -> assertInvoice(invoices, 2, "2021-02-02", 2000))
+                .expectNextMatches(invoices -> assertInvoice(invoices, 3, "2021-02-03", 3000))
+                .expectNextMatches(invoices -> assertInvoice(invoices, 4, "2021-02-04", 4000))
                 .verifyComplete();
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
@@ -101,11 +90,22 @@ class InvoiceServiceIT {
         mockWebServer.enqueue(new MockResponse().setBody(mapperUtil.asJsonString(payload))
                 .addHeader("Content-Type", "application/json"));
 
-        Mono<Invoice> found = service.findById(1L);
-
-        StepVerifier.create(found)
+        StepVerifier.create(service.findById(1L))
                 .expectNextMatches(invoice -> assertInvoice(invoice, 1, "2021-02-01", 1000))
                 .verifyComplete();
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals("GET", recordedRequest.getMethod());
+        assertEquals("/invoices/1", recordedRequest.getPath());
+    }
+
+    @Test
+    void findByIdNotFound() throws Exception {
+        mockWebServer.enqueue(new MockResponse().setResponseCode(NOT_FOUND.code()));
+
+        StepVerifier.create(service.findById(1L))
+                .expectError(ClientErrorException.class)
+                .verify();
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertEquals("GET", recordedRequest.getMethod());
@@ -118,9 +118,7 @@ class InvoiceServiceIT {
         mockWebServer.enqueue(new MockResponse().setBody(mapperUtil.asJsonString(payload))
                 .addHeader("Content-Type", "application/json"));
 
-        Mono<Invoice> created = service.create(payload);
-
-        StepVerifier.create(created)
+        StepVerifier.create(service.create(payload))
                 .expectNextMatches(invoice -> assertInvoice(invoice, 1, "2021-02-01", 1000))
                 .verifyComplete();
 
@@ -131,18 +129,27 @@ class InvoiceServiceIT {
 
     @Test
     void update() throws Exception {
-        LocalDate newIssued = LocalDate.of(2021, FEBRUARY, 1);
-        BigDecimal newTotal = BigDecimal.valueOf(1000);
-        Invoice response = createInvoice(1L, newIssued.toString(), newTotal.doubleValue());
-        mockWebServer.enqueue(new MockResponse().setBody(mapperUtil.asJsonString(response))
+        Invoice payload = createInvoice(1L, "2021-02-01", 1000);
+        mockWebServer.enqueue(new MockResponse().setBody(mapperUtil.asJsonString(payload))
                 .addHeader("Content-Type", "application/json"));
 
-        Invoice payload = createInvoice(newIssued.toString(), newTotal.doubleValue());
-        Mono<Invoice> updated = service.update(1L, payload);
-
-        StepVerifier.create(updated)
-                .expectNextMatches(invoice -> assertInvoice(invoice, 1, newIssued.toString(), newTotal.doubleValue()))
+        StepVerifier.create(service.update(1L, payload))
+                .expectNextMatches(invoice -> assertInvoice(invoice, 1, "2021-02-01", 1000))
                 .verifyComplete();
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals("PUT", recordedRequest.getMethod());
+        assertEquals("/invoices/1", recordedRequest.getPath());
+    }
+
+    @Test
+    void updateNotFound() throws Exception {
+        mockWebServer.enqueue(new MockResponse().setResponseCode(NOT_FOUND.code()));
+
+        Invoice payload = createInvoice(1L, "2021-02-01", 1000);
+        StepVerifier.create(service.update(1L, payload))
+                .expectError(ClientErrorException.class)
+                .verify();
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertEquals("PUT", recordedRequest.getMethod());
@@ -152,14 +159,24 @@ class InvoiceServiceIT {
     @Test
     void delete() throws Exception {
         String responseMessage = "Invoice Deleted SuccessFully";
-        Long invoiceId = 1L;
         mockWebServer.enqueue(new MockResponse().setBody(mapperUtil.asJsonString(responseMessage))
                 .addHeader("Content-Type", "application/json"));
 
-        Mono<Void> deleted = service.delete(invoiceId);
-
-        StepVerifier.create(deleted)
+        StepVerifier.create(service.delete(1L))
                 .verifyComplete();
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals("DELETE", recordedRequest.getMethod());
+        assertEquals("/invoices/1", recordedRequest.getPath());
+    }
+
+    @Test
+    void deleteNotFound() throws Exception {
+        mockWebServer.enqueue(new MockResponse().setResponseCode(NOT_FOUND.code()));
+
+        StepVerifier.create(service.delete(1L))
+                .expectError(ClientErrorException.class)
+                .verify();
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertEquals("DELETE", recordedRequest.getMethod());

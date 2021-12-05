@@ -1,13 +1,12 @@
 package com.schambeck.webclient.service;
 
 import com.schambeck.webclient.domain.Invoice;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 public interface InvoiceService {
 
-    Mono<List<Invoice>> findAll();
+    Flux<Invoice> findAll();
 
     Mono<Invoice> findById(Long id);
 
