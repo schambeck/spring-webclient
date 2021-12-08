@@ -10,7 +10,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 @Configuration
 class RestTemplateConfig {
 
-	@Value("${spring-rest.base-url}")
+	@Value("${app.rest-app.base-url}")
 	private String baseUrl;
 
 	@Bean

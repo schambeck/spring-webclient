@@ -11,7 +11,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Configuration
 class WebClientConfig {
 
-	@Value("${spring-rest.base-url}")
+	@Value("${app.rest-app.base-url}")
 	private String baseUrl;
 
 	@Bean

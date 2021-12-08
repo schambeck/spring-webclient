@@ -28,7 +28,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     public Flux<Invoice> findAll() {
         return client.get()
                 .uri("/invoices")
-                .accept(APPLICATION_NDJSON)
+                .accept(APPLICATION_NDJSON, APPLICATION_JSON)
                 .retrieve()
                 .onStatus(HttpStatus::is4xxClientError, response -> Mono.error(new ClientErrorException("Client error", response.rawStatusCode())))
                 .onStatus(HttpStatus::is5xxServerError, response -> Mono.just(new ServerErrorException("Server error", response.rawStatusCode())))
