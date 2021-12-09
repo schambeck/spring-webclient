@@ -1,4 +1,4 @@
-package com.schambeck.webclient.base;
+package com.schambeck.webclient.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

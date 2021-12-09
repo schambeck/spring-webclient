@@ -1,4 +1,4 @@
-package com.schambeck.webclient.base.exception;
+package com.schambeck.webclient.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

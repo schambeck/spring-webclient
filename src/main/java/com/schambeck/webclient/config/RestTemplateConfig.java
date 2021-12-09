@@ -1,4 +1,4 @@
-package com.schambeck.webclient.base;
+package com.schambeck.webclient.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;

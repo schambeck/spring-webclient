@@ -1,8 +1,8 @@
 package com.schambeck.webclient.service;
 
-import com.schambeck.webclient.base.exception.ClientErrorException;
-import com.schambeck.webclient.base.exception.ServerErrorException;
-import com.schambeck.webclient.base.exception.ServiceUnavailableException;
+import com.schambeck.webclient.exception.ClientErrorException;
+import com.schambeck.webclient.exception.ServerErrorException;
+import com.schambeck.webclient.exception.ServiceUnavailableException;
 import com.schambeck.webclient.domain.Invoice;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

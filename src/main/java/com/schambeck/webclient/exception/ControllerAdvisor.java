@@ -1,4 +1,4 @@
-package com.schambeck.webclient.base.exception;
+package com.schambeck.webclient.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

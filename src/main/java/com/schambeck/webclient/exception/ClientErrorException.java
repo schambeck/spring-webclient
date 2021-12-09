@@ -1,4 +1,4 @@
-package com.schambeck.webclient.base.exception;
+package com.schambeck.webclient.exception;
 
 public class ClientErrorException extends RuntimeException {
 

@@ -2,9 +2,9 @@ package com.schambeck.webclient.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.schambeck.webclient.base.ObjectMapperUtil;
-import com.schambeck.webclient.base.exception.ClientErrorException;
-import com.schambeck.webclient.base.exception.ServiceUnavailableException;
+import com.schambeck.webclient.json.ObjectMapperUtil;
+import com.schambeck.webclient.exception.ClientErrorException;
+import com.schambeck.webclient.exception.ServiceUnavailableException;
 import com.schambeck.webclient.domain.Invoice;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;

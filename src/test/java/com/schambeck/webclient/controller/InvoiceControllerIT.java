@@ -1,6 +1,6 @@
 package com.schambeck.webclient.controller;
 
-import com.schambeck.webclient.base.exception.ClientErrorException;
+import com.schambeck.webclient.exception.ClientErrorException;
 import com.schambeck.webclient.domain.Invoice;
 import com.schambeck.webclient.service.InvoiceService;
 import org.junit.jupiter.api.Tag;
