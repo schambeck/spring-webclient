@@ -1,6 +1,6 @@
 PROFILE_WEBFLUX = -Dspring.profiles.active=local
 PROFILE_WEBMVC = -Dspring.profiles.active=local-mvc
-APP = webclient
+APP = spring-webclient
 VERSION = 0.0.1-SNAPSHOT
 JAR = target/${APP}-${VERSION}.jar
 DELAY_DURATION = 500

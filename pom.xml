@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.schambeck</groupId>
-    <artifactId>webclient</artifactId>
+    <artifactId>spring-webclient</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>webclient</name>
-    <description>webclient</description>
+    <name>spring-webclient</name>
+    <description>spring-webclient</description>
     <properties>
         <java.version>11</java.version>
     </properties>
